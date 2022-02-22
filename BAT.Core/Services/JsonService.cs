@@ -114,12 +114,12 @@
         {
             var bookings = new List<Booking>();
 
-            var bookingDirectory = CreateDirectoryIfNonExistant(Consts.PathBookings);
+            var bookingDirectory = GetOrCreateDirectory(Consts.PathBookings);
 
             if (bookingDirectory.Exists)
             {
                 var accountDirectoryPath = Path.Combine(Consts.PathBookings, account.AccountId.GetDirectoryFormat());
-                var accountDirectory = CreateDirectoryIfNonExistant(accountDirectoryPath);
+                var accountDirectory = GetOrCreateDirectory(accountDirectoryPath);
 
                 if (accountDirectory.Exists)
                 {
@@ -160,7 +160,7 @@
             return success;
         }
 
-        private DirectoryInfo CreateDirectoryIfNonExistant(string path)
+        private DirectoryInfo GetOrCreateDirectory(string path)
         {
             var directory = new DirectoryInfo(path);
 

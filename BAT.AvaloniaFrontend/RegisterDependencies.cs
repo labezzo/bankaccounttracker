@@ -2,7 +2,7 @@
 {
     using Microsoft.Extensions.DependencyInjection;
 
-    internal class RegisterDependencies
+    internal static class RegisterDependencies
     {
         internal static void Register(IServiceCollection serviceCollection)
         {

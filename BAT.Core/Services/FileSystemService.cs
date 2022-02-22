@@ -12,7 +12,7 @@
             if (!string.IsNullOrWhiteSpace(accountId))
             {
                 var bookingsDir = GetOrCreateDirectoryInfo(Consts.PathBookings);
-                if (bookingsDir.Exists)
+                if (bookingsDir != null && bookingsDir.Exists)
                 {
                     var accountDirectoryPath = Path.Combine(Consts.PathBookings, accountId);
                     var accountDirectory = GetOrCreateDirectoryInfo(accountDirectoryPath);

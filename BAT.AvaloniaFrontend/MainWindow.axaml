@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BAT.AvaloniaFrontend.MainWindow"
+        Title="BAT.AvaloniaFrontend"
+        Width="1000" Height="600">
+
+	
+	
+	
+
+	<Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
+        ColumnDefinitions="Auto,*"
+        Margin="30"
+        Width="600">
+		<Grid.Styles>
+			<Style Selector="Button">
+				<Setter Property="Margin" Value="3"/>
+			</Style>
+		</Grid.Styles>
+
+		<Button Grid.Row="0" Name="button" Click="button_Click">New Account</Button>
+
+		<Button Grid.Row="1" Name="buttonBooking" Click="buttonBooking_Click">New Booking</Button>
+
+		<Button Grid.Row="2" Name="buttonBookingsByAccount" Click="buttonBookingsByAccount_Click">All Bookings by Account</Button>
+
+	</Grid>
+
+</Window>

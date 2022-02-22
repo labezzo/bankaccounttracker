@@ -9,9 +9,14 @@ namespace BAT.AvaloniaFrontend
 
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly IJsonService _jsonService;
+
+        public MainWindow() : this(new JsonService()) { }
+
+        public MainWindow(IJsonService jsonService)
         {
             InitializeComponent();
+            _jsonService = jsonService;
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -27,8 +32,7 @@ namespace BAT.AvaloniaFrontend
             var button = (Button)sender;
             button.Content = "Hello, Avalonia!";
 
-            IJsonService jsonService = new JsonService();
-            jsonService.AddAccount("Comdirect", "Girokonto", 123.45);
+            _jsonService.AddAccount("Comdirect", "Girokonto", 123.45);
         }
 
         public void buttonBooking_Click(object sender, RoutedEventArgs e)
@@ -36,12 +40,11 @@ namespace BAT.AvaloniaFrontend
             var button = (Button)sender;
             button.Content = "BOOOOOOOOOOKED";
 
-            IJsonService jsonService = new JsonService();
-            var account = jsonService.GetAccount("Comdirect", "Girokonto");
+            var account = _jsonService.GetAccount("Comdirect", "Girokonto");
 
             if (account != null)
             {
-                jsonService.AddBooking(account, 1.00, DateTime.Now, "Something");
+                _jsonService.AddBooking(account, 1.00, DateTime.Now, "Something");
             }
         }
 
@@ -49,12 +52,11 @@ namespace BAT.AvaloniaFrontend
         {
             var button = (Button)sender;
 
-            IJsonService jsonService = new JsonService();
-            var account = jsonService.GetAccount("Comdirect", "Girokonto");
+            var account = _jsonService.GetAccount("Comdirect", "Girokonto");
 
             if (account != null)
             {
-                var bookings = jsonService.GetAllBookingsByAccount(account);
+                var bookings = _jsonService.GetAllBookingsByAccount(account);
             }
         }
     }

@@ -10,9 +10,13 @@
 
     public class JsonService : IJsonService
     {
-        public JsonService()
-        {
+        private readonly IFileSystemService _fileSystemService;
 
+        public JsonService() : this(new FileSystemService()) { }
+
+        public JsonService(IFileSystemService fileSystemService)
+        {
+            _fileSystemService = fileSystemService;
         }
 
         public bool AddAccount(string bank, string name, double balance)
@@ -88,22 +92,15 @@
         {
             var accounts = new List<Account>();
 
-            var jsonFileExists = File.Exists(Consts.JsonPathAccounts);
-            if (!jsonFileExists)
+            var jsonFile = _fileSystemService.GetOrCreateFileInfo(Consts.JsonPathAccounts);
+            if (jsonFile != null && jsonFile.Exists)
             {
-                jsonFileExists = CreateFile(Consts.JsonPathAccounts);
-            }
+                var json = _fileSystemService.ReadFromFile(jsonFile.FullName);
 
-            if (jsonFileExists)
-            {
-                using (var streamReader = new StreamReader(Consts.JsonPathAccounts))
+                var accountsFromJson = JsonConvert.DeserializeObject<List<Account>>(json);
+                if (accountsFromJson != null && accountsFromJson.Any())
                 {
-                    var json = streamReader.ReadToEnd();
-                    var accountsFromJson = JsonConvert.DeserializeObject<List<Account>>(json);
-                    if (accountsFromJson != null && accountsFromJson.Any())
-                    {
-                        accounts = accountsFromJson;
-                    }
+                    accounts = accountsFromJson;
                 }
             }
 
@@ -114,28 +111,21 @@
         {
             var bookings = new List<Booking>();
 
-            var bookingDirectory = GetOrCreateDirectory(Consts.PathBookings);
-
-            if (bookingDirectory.Exists)
+            var accountDirectory = _fileSystemService.GetAccountDirectoryInfo(account.AccountId.GetDirectoryFormat());
+            if (accountDirectory != null && accountDirectory.Exists)
             {
-                var accountDirectoryPath = Path.Combine(Consts.PathBookings, account.AccountId.GetDirectoryFormat());
-                var accountDirectory = GetOrCreateDirectory(accountDirectoryPath);
-
-                if (accountDirectory.Exists)
+                var bookingJsonFiles = accountDirectory.GetFiles();
+                if (bookingJsonFiles != null && bookingJsonFiles.Any())
                 {
-                    var bookingJsonFiles = accountDirectory.GetFiles();
-                    if (bookingJsonFiles != null && bookingJsonFiles.Any())
+                    foreach (var bookingJsonFile in bookingJsonFiles)
                     {
-                        foreach (var bookingJsonFile in bookingJsonFiles)
+                        using (var streamReader = new StreamReader(bookingJsonFile.FullName))
                         {
-                            using (var streamReader = new StreamReader(bookingJsonFile.FullName))
+                            var json = streamReader.ReadToEnd();
+                            var bookingsFromJson = JsonConvert.DeserializeObject<List<Booking>>(json);
+                            if (bookingsFromJson != null && bookingsFromJson.Any())
                             {
-                                var json = streamReader.ReadToEnd();
-                                var bookingsFromJson = JsonConvert.DeserializeObject<List<Booking>>(json);
-                                if (bookingsFromJson != null && bookingsFromJson.Any())
-                                {
-                                    bookings.AddRange(bookingsFromJson);
-                                }
+                                bookings.AddRange(bookingsFromJson);
                             }
                         }
                     }
@@ -149,27 +139,7 @@
         {
             accounts.Add(account);
             var accountsJson = JsonConvert.SerializeObject(accounts);
-            File.WriteAllText(Consts.JsonPathAccounts, accountsJson);
-        }
-
-        private bool CreateFile(string path)
-        {
-            File.Create(path).Close();
-            var success = File.Exists(path);
-
-            return success;
-        }
-
-        private DirectoryInfo GetOrCreateDirectory(string path)
-        {
-            var directory = new DirectoryInfo(path);
-
-            if (!directory.Exists)
-            {
-                directory = Directory.CreateDirectory(path);
-            }
-
-            return directory;
+            _fileSystemService.WriteToFile(Consts.JsonPathAccounts, accountsJson);
         }
     }
 }

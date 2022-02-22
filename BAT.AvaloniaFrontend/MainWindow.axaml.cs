@@ -29,17 +29,11 @@ namespace BAT.AvaloniaFrontend
 
         public void button_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            button.Content = "Hello, Avalonia!";
-
             _jsonService.AddAccount("Comdirect", "Girokonto", 123.45);
         }
 
         public void buttonBooking_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            button.Content = "BOOOOOOOOOOKED";
-
             var account = _jsonService.GetAccount("Comdirect", "Girokonto");
 
             if (account != null)
@@ -50,8 +44,6 @@ namespace BAT.AvaloniaFrontend
 
         public void buttonBookingsByAccount_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-
             var account = _jsonService.GetAccount("Comdirect", "Girokonto");
 
             if (account != null)

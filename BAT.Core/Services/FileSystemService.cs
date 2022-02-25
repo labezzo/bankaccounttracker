@@ -20,11 +20,19 @@
                     {
                         directoryInfo = accountDirectory;
                     }
+                    else
+                    {
+                        LogService.LogInfo("accountDirectory does not exist. Path: " + accountDirectoryPath);
+                    }
+                }
+                else
+                {
+                    LogService.LogInfo("bookingsDir does not exist. Path: " + Consts.PathBookings);
                 }
             }
             else
             {
-                // todo: logging -> accountId empty
+                LogService.LogInfo("accountId is empty");
             }
 
             return directoryInfo;
@@ -41,6 +49,10 @@
                 {
                     directory = Directory.CreateDirectory(path);
                 }
+            }
+            else
+            {
+                LogService.LogInfo("path is empty");
             }
 
             return directory;
@@ -59,6 +71,10 @@
                     file = new FileInfo(path);
                 }
             }
+            else
+            {
+                LogService.LogInfo("path is empty");
+            }
 
             return file;
         }
@@ -76,7 +92,7 @@
                 }
                 catch (Exception ex)
                 {
-                    // todo: logging -> failed to write to file
+                    LogService.LogError("error writing to file", ex);
                 }
             }
 
@@ -93,6 +109,10 @@
                 {
                     content = streamReader.ReadToEnd();
                 }
+            }
+            else
+            {
+                LogService.LogInfo("path is empty");
             }
 
             return content;

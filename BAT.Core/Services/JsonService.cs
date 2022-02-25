@@ -23,19 +23,23 @@
         {
             bool success = false;
 
-            if (!string.IsNullOrWhiteSpace(bank) && !string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(bank) || string.IsNullOrWhiteSpace(name))
             {
-                var accounts = ReadAccountsFromJson();
-                var account = accounts.FirstOrDefault(acc => acc.Bank.Equals(bank) && acc.Name.Equals(name));
-                if (account == null)
-                {
-                    account = new Account(bank, name, balance);
-                    WriteAccountToJson(accounts, account);
-                }
-                else
-                {
-                    // todo: logging -> account already exists
-                }
+                LogService.LogInfo("bank or name is empty");
+                return success;
+            }
+
+            var accounts = ReadAccountsFromJson();
+            var account = accounts.FirstOrDefault(acc => acc.Bank.Equals(bank) && acc.Name.Equals(name));
+            if (account == null)
+            {
+                account = new Account(bank, name, balance);
+                WriteAccountToJson(accounts, account);
+            }
+            else
+            {
+                var logMsg = "account alread exists. bank|name: " + bank + "|" + name;
+                LogService.LogWarn(logMsg);
             }
 
             return success;
@@ -47,6 +51,7 @@
 
             if (amount == 0.00 || string.IsNullOrWhiteSpace(description) || account == null)
             {
+                LogService.LogInfo("bank or name is empty");
                 return success;
             }
 
@@ -62,6 +67,7 @@
 
             if (string.IsNullOrWhiteSpace(bank) || string.IsNullOrWhiteSpace(name))
             {
+                LogService.LogInfo("bank or name is empty");
                 return account;
             }
 
@@ -69,6 +75,10 @@
             if (accounts != null)
             {
                 account = accounts.FirstOrDefault(acc => acc.Bank.Equals(bank) && acc.Name.Equals(name));
+            }
+            else
+            {
+                LogService.LogInfo("there are no accounts");
             }
 
             return account;
@@ -80,6 +90,7 @@
 
             if (account == null)
             {
+                LogService.LogInfo("account is null");
                 return bookings;
             }
 
@@ -93,15 +104,22 @@
             var accounts = new List<Account>();
 
             var jsonFile = _fileSystemService.GetOrCreateFileInfo(Consts.JsonPathAccounts);
-            if (jsonFile != null && jsonFile.Exists)
+            if (jsonFile == null || !jsonFile.Exists)
             {
-                var json = _fileSystemService.ReadFromFile(jsonFile.FullName);
+                LogService.LogInfo("jsonfile does not exist");
+                return accounts;
+            }
 
-                var accountsFromJson = JsonConvert.DeserializeObject<List<Account>>(json);
-                if (accountsFromJson != null && accountsFromJson.Any())
-                {
-                    accounts = accountsFromJson;
-                }
+            var json = _fileSystemService.ReadFromFile(jsonFile.FullName);
+
+            var accountsFromJson = JsonConvert.DeserializeObject<List<Account>>(json);
+            if (accountsFromJson != null && accountsFromJson.Any())
+            {
+                accounts = accountsFromJson;
+            }
+            else
+            {
+                LogService.LogInfo("there are no accounts in json");
             }
 
             return accounts;
@@ -112,22 +130,28 @@
             var bookings = new List<Booking>();
 
             var accountDirectory = _fileSystemService.GetAccountDirectoryInfo(account.AccountId.GetDirectoryFormat());
-            if (accountDirectory != null && accountDirectory.Exists)
+            if (accountDirectory == null || !accountDirectory.Exists)
             {
-                var bookingJsonFiles = accountDirectory.GetFiles();
-                if (bookingJsonFiles != null && bookingJsonFiles.Any())
+                LogService.LogInfo("accountDirectory does not exist");
+                return bookings;
+            }
+
+            var bookingJsonFiles = accountDirectory.GetFiles();
+            if (bookingJsonFiles == null || !bookingJsonFiles.Any())
+            {
+                LogService.LogInfo("there are no booking json files");
+                return bookings;
+            }
+
+            foreach (var bookingJsonFile in bookingJsonFiles)
+            {
+                using (var streamReader = new StreamReader(bookingJsonFile.FullName))
                 {
-                    foreach (var bookingJsonFile in bookingJsonFiles)
+                    var json = streamReader.ReadToEnd();
+                    var bookingsFromJson = JsonConvert.DeserializeObject<List<Booking>>(json);
+                    if (bookingsFromJson != null && bookingsFromJson.Any())
                     {
-                        using (var streamReader = new StreamReader(bookingJsonFile.FullName))
-                        {
-                            var json = streamReader.ReadToEnd();
-                            var bookingsFromJson = JsonConvert.DeserializeObject<List<Booking>>(json);
-                            if (bookingsFromJson != null && bookingsFromJson.Any())
-                            {
-                                bookings.AddRange(bookingsFromJson);
-                            }
-                        }
+                        bookings.AddRange(bookingsFromJson);
                     }
                 }
             }

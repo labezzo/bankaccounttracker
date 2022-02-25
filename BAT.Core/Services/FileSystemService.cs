@@ -34,7 +34,7 @@
         {
             DirectoryInfo directory = null;
 
-            if (string.IsNullOrWhiteSpace(path))
+            if (!string.IsNullOrWhiteSpace(path))
             {
                 directory = new DirectoryInfo(path);
                 if (!directory.Exists)

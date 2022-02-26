@@ -3,7 +3,6 @@
     using BAT.Core.Helpers;
     using BAT.Core.Models;
     using Newtonsoft.Json;
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -34,7 +33,7 @@
             if (account == null)
             {
                 account = new Account(bank, name, balance);
-                WriteAccountToJson(accounts, account);
+                CreateOrUpdateAccount(account, accounts);
             }
             else
             {
@@ -55,8 +54,11 @@
                 return success;
             }
 
-            // todo: implement
-            throw new NotImplementedException();
+            var booking = new Booking(amount, description, date);
+            WriteBookingToJson(account, booking);
+            account.Balance += booking.Amount;
+            CreateOrUpdateAccount(account);
+            success = true;
 
             return success;
         }
@@ -159,11 +161,37 @@
             return bookings;
         }
 
-        private void WriteAccountToJson(List<Account> accounts, Account account)
+        private void CreateOrUpdateAccount(Account account, List<Account> accounts = null)
         {
-            accounts.Add(account);
+            if (accounts == null)
+            {
+                accounts = ReadAccountsFromJson();
+            }
+
+            var accountFromJson = accounts.FirstOrDefault(acc => acc.AccountId.Equals(account.AccountId));
+            if (accountFromJson == null)
+            {
+                accounts.Add(account);
+            }
+            else
+            {
+                accounts[accounts.IndexOf(accountFromJson)] = account;
+            }
+
+            WriteAccountsToJson(accounts);
+        }
+
+        private void WriteAccountsToJson(List<Account> accounts)
+        {
             var accountsJson = JsonConvert.SerializeObject(accounts);
             _fileSystemService.WriteToFile(Consts.JsonPathAccounts, accountsJson);
+        }
+
+        private void WriteBookingToJson(Account account, Booking booking)
+        {
+            var bookingsJson = JsonConvert.SerializeObject(booking);
+            var path = Path.Combine(Consts.PathBookings, account.AccountId.GetDirectoryFormat(), booking.Date.GetBookingsJsonFileName());
+            _fileSystemService.WriteToFile(path, bookingsJson);
         }
     }
 }

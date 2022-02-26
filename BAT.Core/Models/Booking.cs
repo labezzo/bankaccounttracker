@@ -6,7 +6,7 @@
 
     public class Booking
     {
-        public int BookingId { get; set; }
+        public Guid BookingId { get; set; }
         public double Amount { get; set; }
         public string Description { get; set; }
         /// <summary>
@@ -14,5 +14,14 @@
         /// </summary>
         public double InitialAmount { get; set; }
         public DateTime Date { get; set; }
+
+        public Booking(double amount, string description, DateTime date)
+        {
+            Amount = amount;
+            InitialAmount = amount;
+            Description = description;
+            Date = date;
+            BookingId = Guid.NewGuid();
+        }
     }
 }

@@ -150,10 +150,10 @@
                 using (var streamReader = new StreamReader(bookingJsonFile.FullName))
                 {
                     var json = streamReader.ReadToEnd();
-                    var bookingsFromJson = JsonConvert.DeserializeObject<List<Booking>>(json);
-                    if (bookingsFromJson != null && bookingsFromJson.Any())
+                    var bookingFromJson = JsonConvert.DeserializeObject<Booking>(json);
+                    if (bookingFromJson != null)
                     {
-                        bookings.AddRange(bookingsFromJson);
+                        bookings.Add(bookingFromJson);
                     }
                 }
             }

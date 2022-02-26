@@ -6,5 +6,6 @@
         internal const string PathBookings = @"C:\kgw\Bookings";
 
         internal const string GuidDirectoryFormat = "D";
+        internal const string BookingFileNameDateFormat = "yyyyMMdd-HHmmss";
     }
 }

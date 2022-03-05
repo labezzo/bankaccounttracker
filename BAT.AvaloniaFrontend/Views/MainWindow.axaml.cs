@@ -1,4 +1,4 @@
-namespace BAT.AvaloniaFrontend
+namespace BAT.AvaloniaFrontend.Views
 {
     using Avalonia;
     using Avalonia.Controls;

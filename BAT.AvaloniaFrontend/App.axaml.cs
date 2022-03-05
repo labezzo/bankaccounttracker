@@ -3,6 +3,7 @@ namespace BAT.AvaloniaFrontend
     using Avalonia;
     using Avalonia.Controls.ApplicationLifetimes;
     using Avalonia.Markup.Xaml;
+    using BAT.AvaloniaFrontend.Views;
     using log4net;
     using log4net.Config;
     using Microsoft.Extensions.DependencyInjection;

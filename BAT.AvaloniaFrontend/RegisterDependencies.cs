@@ -1,5 +1,6 @@
 ﻿namespace BAT.AvaloniaFrontend
 {
+    using BAT.AvaloniaFrontend.Views;
     using Microsoft.Extensions.DependencyInjection;
 
     internal static class RegisterDependencies
